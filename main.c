@@ -8,6 +8,9 @@
 #include "main.h"
 #include "ledhandler.h"
 
+#define SHOW_BINARY_COUNTER (0u)
+#define SHOW_START_STOP (1u)
+
 static volatile uint32_t ticks = 0;
 
 int main(void)
@@ -20,13 +23,36 @@ int main(void)
 	
 	StringToUsart2("Reboot\r\n");
 	
+#if SHOW_BINARY_COUNTER
 	InitLedHandler();
 	
 	while (1)
 	{	
 		BinaryCounterLoop();
 	}
-	
+#endif
+#if SHOW_START_STOP
+	uint8_t lastButtons = 0;
+	uint8_t activeButtons = 0;
+	while(true)
+	{
+		/* Doordat de knoppen gepolled worden voor 'press' en 'release', moet dender voorkomen worden.
+		 * Dit doen we door de staat tussen twee moment opname (delta 100ms) te vergelijken */
+		activeButtons = (SW1Active() << 0u) | (SW4Active() << 1u);
+		if (activeButtons == lastButtons) continue;
+
+		/* Voorkom knop dender */
+		WaitForMs(100u);
+
+		lastButtons = (SW1Active() << 0u) | (SW4Active() << 1u);
+		if (activeButtons == lastButtons)
+		{
+			if ((activeButtons & 1u) == 1u) ToggleLED(0); // LED 1
+			if ((activeButtons & 2u) == 2u) ToggleLED(7); // LED 8
+		}
+	}
+#endif
+
 	return 0;
 }
 
