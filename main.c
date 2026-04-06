@@ -1,12 +1,3 @@
-// Basiscode voor het starten van eender welk project op een Nucleo-F091RC met Nucleo Extension Shield V2.
-//
-// OPM:
-//	- via 'Project -> Manage -> Select software packs' kies je bij Keil::STM32F0xx_DFP voor versie 2.0.0.
-//	- via 'Options for Target -> C/C++' zet je de compiler op C11, optimizations op O0 en warnings op AC5-like.
-// 
-// Versie: 20260129
-
-// Includes.
 #include "stm32f091xc.h"
 #include "stdio.h"
 #include "stdbool.h"
@@ -15,59 +6,35 @@
 #include "usart2.h"
 #include "ad.h"
 #include "main.h"
+#include "ledhandler.h"
 
-// Variabelen aanmaken. 
-// OPM: het keyword 'static', zorgt ervoor dat de variabele enkel binnen dit bestand gebruikt kan worden.
-static uint8_t count = 0;
 static volatile uint32_t ticks = 0;
 
-// Entry point.
 int main(void)
 {
-	// Initialisaties.
 	SystemClock_Config();
 	InitButtons();
 	InitLeds();
 	InitUsart2(9600);
 	InitAd();
 	
-	// Laten weten dat we opgestart zijn, via de USART2 (USB).
 	StringToUsart2("Reboot\r\n");
 	
-	// LED's testen.
-	for(count = 0; count <= 8; count++)
-	{
-		SetLed(count);
-		WaitForMs(100);
-	}
-	WaitForMs(250);
-	ByteToLeds(0);
+	InitLedHandler();
 	
-	// Oneindige lus starten.
 	while (1)
 	{	
-		// Knoppen en LED's testen.
-		if(SW1Active() || SW2Active() || SW3Active() || SW4Active() || UserButtonActive())
-			ByteToLeds(255);
-		else
-		{
-			WaitForMs(100);
-			count++;
-			ByteToLeds(count);
-		}
+		BinaryCounterLoop();
 	}
 	
-	// Terugkeren zonder fouten... (unreachable).
 	return 0;
 }
 
-// Handler die iedere 1ms afloopt. Ingesteld met SystemCoreClockUpdate() en SysTick_Config().
 void SysTick_Handler(void)
 {
 	ticks++;
 }
 
-// Wachtfunctie via de SysTick.
 void WaitForMs(uint32_t timespan)
 {
 	uint32_t startTime = ticks;
@@ -75,7 +42,6 @@ void WaitForMs(uint32_t timespan)
 	while(ticks < startTime + timespan);
 }
 
-// Klokken instellen. Deze functie niet wijzigen, tenzij je goed weet wat je doet.
 void SystemClock_Config(void)
 {
 	RCC->CR |= RCC_CR_HSITRIM_4;														// HSITRIM op 16 zetten, dit is standaard (ook na reset).

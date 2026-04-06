@@ -9,6 +9,4 @@
 	void ClearLed(uint8_t ledNumber);
 	void ToggleLed(uint8_t ledNumber);
 	void FlashLed(uint8_t ledNumber, uint8_t flashTime);
-	void ByteToLeds(uint8_t data);
-	void ByteToLevel(uint8_t level);
 #endif

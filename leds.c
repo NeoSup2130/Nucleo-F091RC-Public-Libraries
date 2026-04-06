@@ -29,7 +29,7 @@ void InitLeds(void)
 	GPIOA->MODER = (GPIOA->MODER & ~GPIO_MODER_MODER5) | GPIO_MODER_MODER5_0;
 }
 
-// Functie om één LED, in te schakelen.
+// Functie om ï¿½ï¿½n LED, in te schakelen.
 void SetLed(uint8_t ledNumber)
 {	
 	switch(ledNumber)
@@ -77,7 +77,7 @@ void SetLed(uint8_t ledNumber)
 	}
 }
 
-// Functie om één LED, te doven.
+// Functie om ï¿½ï¿½n LED, te doven.
 void ClearLed(uint8_t ledNumber)
 {	
 	switch(ledNumber)
@@ -125,7 +125,7 @@ void ClearLed(uint8_t ledNumber)
 	}
 }
 
-// Functie om één LED, om te keren van toestand.
+// Functie om ï¿½ï¿½n LED, om te keren van toestand.
 void ToggleLed(uint8_t ledNumber)
 {
 	switch(ledNumber)
@@ -173,78 +173,11 @@ void ToggleLed(uint8_t ledNumber)
 	}
 }
 
-// Functie om één LED, even te laten knipperen.
+// Functie om ï¿½ï¿½n LED, even te laten knipperen.
 // OPM: de flitstijd wordt hier met opzet beperkt tot 255 ms...
 void FlashLed(uint8_t ledNumber, uint8_t flashTime)
 {
 	SetLed(ledNumber);
 	WaitForMs(flashTime);
 	ClearLed(ledNumber);	
-}
-
-// Functie om de data van één byte op de 8 LED's te plaatsen.
-void ByteToLeds(uint8_t data)
-{
-	if(data & 0x01)
-		GPIOC->ODR = GPIOC->ODR | GPIO_ODR_0;
-	else
-		GPIOC->ODR = GPIOC->ODR & ~GPIO_ODR_0;
-
-	if(data & 0x02)
-		GPIOB->ODR = GPIOB->ODR | GPIO_ODR_3;
-	else
-		GPIOB->ODR = GPIOB->ODR & ~GPIO_ODR_3;
-
-	if(data & 0x04)
-		GPIOB->ODR = GPIOB->ODR | GPIO_ODR_5;
-	else
-		GPIOB->ODR = GPIOB->ODR & ~GPIO_ODR_5;
-
-	if(data & 0x08)
-		GPIOB->ODR = GPIOB->ODR | GPIO_ODR_4;
-	else
-		GPIOB->ODR = GPIOB->ODR & ~GPIO_ODR_4;
-
-	if(data & 0x10)
-		GPIOB->ODR = GPIOB->ODR | GPIO_ODR_10;
-	else
-		GPIOB->ODR = GPIOB->ODR & ~GPIO_ODR_10;
-
-	if(data & 0x20)
-		GPIOA->ODR = GPIOA->ODR | GPIO_ODR_8;
-	else
-		GPIOA->ODR = GPIOA->ODR & ~GPIO_ODR_8;
-
-	if(data & 0x40)
-		GPIOC->ODR = GPIOC->ODR | GPIO_ODR_7;
-	else
-		GPIOC->ODR = GPIOC->ODR & ~GPIO_ODR_7;
-
-	if(data & 0x80)
-		GPIOB->ODR = GPIOB->ODR | GPIO_ODR_6;
-	else
-		GPIOB->ODR = GPIOB->ODR & ~GPIO_ODR_6;
-}
-
-// Functie om de data van één byte als 'niveau' op de 8 LED's te plaatsen.
-void ByteToLevel(uint8_t level)
-{
-    if(level<16)
-        ByteToLeds(0);
-    else if(level < 48)
-        ByteToLeds(1);
-    else if(level < 80)
-        ByteToLeds(3);
-    else if(level < 112)
-        ByteToLeds(7);
-    else if(level < 144)
-        ByteToLeds(15);
-    else if(level < 176)
-        ByteToLeds(0x1F);
-    else if(level < 208)
-        ByteToLeds(0x3F);
-    else if(level < 240)
-        ByteToLeds(0x7F);
-    else
-        ByteToLeds(255);
 }
