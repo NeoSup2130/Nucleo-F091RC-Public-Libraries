@@ -7,9 +7,11 @@
 #include "ad.h"
 #include "main.h"
 #include "ledhandler.h"
+#include "printio.h"
 
 #define SHOW_BINARY_COUNTER (0u)
-#define SHOW_START_STOP (1u)
+#define SHOW_START_STOP (0u)
+#define SHOW_VOLUME_METER (1u)
 
 static volatile uint32_t ticks = 0;
 
@@ -50,6 +52,32 @@ int main(void)
 			if ((activeButtons & 1u) == 1u) ToggleLED(0); // LED 1
 			if ((activeButtons & 2u) == 2u) ToggleLED(7); // LED 8
 		}
+	}
+#endif
+#if SHOW_VOLUME_METER
+	print("Volume meter\n\r");
+	uint8_t ad_level = 0, highest_level = 0, ad_step = 256u / 8u;
+	uint8_t msec_count = 0;
+	while(true)
+	{
+		ad_level = (uint8_t)(GetAdValue() >> 4u);
+		/* msec_count wordt met elke 10ms verhoogd.
+		 * Als msec >= 1000ms of AD is groter dan max, pas AD niveau aan. */
+		if (++msec_count >= 100u || ad_level > highest_level)
+		{
+			highest_level = ad_level;
+			msec_count = 0;
+		}
+		/* Doof LEDs zodat de correcte aantal LEDs getoond worden */
+		ResetLEDs();
+		/* Toon huidige AD niveau aan via LEDs*/
+		for (uint8_t i = 0, max = ad_level / ad_step; i < (max + 1); i++)
+			SetLED(i, true);
+
+		/* Toon hoogste AD niveau van de afgelopen 1000ms */
+		SetLED(highest_level / ad_step, true);
+
+		WaitForMs(10);
 	}
 #endif
 
